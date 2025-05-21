@@ -20,20 +20,34 @@ app.get('/', (req,res) =>{
     res.send('Express App is Running')
 })
 
-//Image Storage Engine
+// //Image Storage Engine
+// const storage = multer.diskStorage({
+//     destination: './upload/images',
+//     filename: (req,file,cb)=>{
+//         return cb(null,`${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`)
+//     }
+// })
+// // const upload = multer({storage:storage})
+// const upload = require('./multerConfig'); // path to the multer config file
+// //Creating upload Endpoint for images
+// app.use('/images',express.static('upload/images') )
+// app.post('/upload', upload.single('product'), (req, res) => {
+//   if (!req.file) {
+//     return res.status(400).json({
+//       success: 0,
+//       message: "No file uploaded",
+//     });
+//   }
+//   res.json({
+//     success: 1,
+//     // image_url: `http://localhost:${port}/images/${req.file.filename}`,
+//     image_url: `https://auraholic-backend.onrender.com/images/${req.file.filename}`,
+//   });
+// });
+// const express = require('express');
+const upload = require('./multerConfig'); // using Cloudinary now
 
-const storage = multer.diskStorage({
-    destination: './upload/images',
-    filename: (req,file,cb)=>{
-        return cb(null,`${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`)
-    }
-})
-
-const upload = multer({storage:storage})
-
-//Creating upload Endpoint for images
-app.use('/images',express.static('upload/images') )
-
+// Upload endpoint
 app.post('/upload', upload.single('product'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({
@@ -44,10 +58,13 @@ app.post('/upload', upload.single('product'), (req, res) => {
 
   res.json({
     success: 1,
-    // image_url: `http://localhost:${port}/images/${req.file.filename}`,
-    image_url: `https://auraholic-backend.onrender.com/images/${req.file.filename}`,
+    image_url: req.file.path, // 🔥 Cloudinary gives back a full URL
   });
 });
+
+
+
+
 
 //Schema for creating products
 const Product = mongoose.model("product", {
